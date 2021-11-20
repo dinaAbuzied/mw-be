@@ -13,10 +13,12 @@ router.get('/short', async (req, res) => {
         }
     )
         .then(function (response) {
-            return res.send(response.data.results.slice(0, 6).map(movie => {
-                const { genre_ids, title, poster_path, release_date, id } = movie;
-                return { genre_ids, title, poster_path, release_date, id }
-            }));
+            return res.send({
+                results: response.data.results.slice(0, 6).map(movie => {
+                    const { genre_ids, title, poster_path, release_date, id } = movie;
+                    return { genre_ids, title, poster_path, release_date, id }
+                })
+            });
         })
         .catch(function (error) {
             res.status(500).send({ code: 500, message: error.message });
