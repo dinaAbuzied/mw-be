@@ -2,6 +2,8 @@ const morgan = require('morgan');
 // const mongoose = require('mongoose');
 const search = require('./routes/search');
 const genres = require('./routes/genres');
+const languages = require('./routes/languages');
+const movie = require('./routes/movie');
 const cors = require('cors');
 const express = require('express');
 const app = express();
@@ -18,6 +20,8 @@ app.use(express.json());
 app.use(morgan('tiny'));
 app.use('/api/search', search);
 app.use('/api/genres', genres);
+app.use('/api/languages', languages);
+app.use('/api/movie', movie);
 
 app.listen(3100, () => console.log('Listening on port 3100....'));
 

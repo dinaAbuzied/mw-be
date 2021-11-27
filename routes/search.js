@@ -28,17 +28,12 @@ router.get('/short', async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-    axios.get(tmdbURL + 'search/movie',
-        {
-            params: {
-                api_key: tmdbKey,
-                query: req.query.query,
-                language: 'en-US',
-                include_adult: false,
-                page: req.query.page
-            }
-        }
-    )
+    let filters;
+    if (req.query.filters) {
+        filters = JSON.parse(req.query.filters);
+        console.log(filters.language)
+    }
+    search(req.query.page, req.query.query)
         .then(function (response) {
             const { results, page, total_results, total_pages } = response.data;
             return res.send({
@@ -53,5 +48,19 @@ router.get('/', async (req, res) => {
             res.status(500).send({ code: 500, message: error.message });
         });
 })
+
+function search(page, query) {
+    return axios.get(tmdbURL + 'search/movie',
+        {
+            params: {
+                api_key: tmdbKey,
+                query,
+                language: 'en-US',
+                include_adult: false,
+                page
+            }
+        }
+    )
+}
 
 module.exports = router;
