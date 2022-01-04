@@ -4,11 +4,10 @@ const axios = require('axios');
 const { tmdbURL, tmdbKey } = require('../config');
 
 router.get('/', async (req, res) => {
-    const id = req.query.id;
-    if (!id) {
+    if (!req.query.id) {
         return res.status(500).send({ code: 500, message: 'no movie id provided' });
     }
-    axios.get(tmdbURL + 'movie/' + id,
+    axios.get(tmdbURL + 'movie/' + req.query.id,
         {
             params: {
                 api_key: tmdbKey
@@ -25,11 +24,10 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/credits', async (req, res) => {
-    const id = req.query.id;
-    if (!id) {
+    if (!req.query.id) {
         return res.status(500).send({ code: 500, message: 'no movie id provided' });
     }
-    axios.get(tmdbURL + 'movie/' + id + '/credits',
+    axios.get(tmdbURL + 'movie/' + req.query.id + '/credits',
         {
             params: {
                 api_key: tmdbKey
@@ -50,6 +48,27 @@ router.get('/credits', async (req, res) => {
                 return { id, name, job, profile_path };
             });
             return res.send({ id: response.data.id, actors, writers, directors });
+        })
+        .catch(function (error) {
+            res.status(500).send({ code: 500, message: error.message });
+        });
+})
+
+router.get('/now_playing', async (req, res) => {
+    axios.get(tmdbURL + 'movie/now_playing',
+        {
+            params: {
+                api_key: tmdbKey
+            }
+        }
+    )
+        .then(function (response) {
+            return res.send({
+                results: response.data.results.slice(0, 10).map(movie => {
+                    const { title, poster_path, id } = movie;
+                    return { title, poster_path, id }
+                })
+            });
         })
         .catch(function (error) {
             res.status(500).send({ code: 500, message: error.message });
