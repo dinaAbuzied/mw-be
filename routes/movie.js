@@ -55,7 +55,15 @@ router.get('/credits', async (req, res) => {
 })
 
 router.get('/now_playing', async (req, res) => {
-    axios.get(tmdbURL + 'movie/now_playing',
+    getMovieList('now_playing', res);
+})
+
+router.get('/upcoming', async (req, res) => {
+    getMovieList('upcoming', res);
+})
+
+const getMovieList = (type, res) => {
+    axios.get(tmdbURL + 'movie/' + type,
         {
             params: {
                 api_key: tmdbKey
@@ -73,6 +81,6 @@ router.get('/now_playing', async (req, res) => {
         .catch(function (error) {
             res.status(500).send({ code: 500, message: error.message });
         });
-})
+}
 
 module.exports = router;
