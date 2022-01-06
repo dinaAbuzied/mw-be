@@ -5,6 +5,7 @@ const genres = require('./routes/genres');
 const languages = require('./routes/languages');
 const movie = require('./routes/movie');
 const users = require('./routes/users');
+const images = require('./routes/images');
 const cors = require('cors');
 const express = require('express');
 const app = express();
@@ -24,6 +25,7 @@ app.use('/api/genres', genres);
 app.use('/api/languages', languages);
 app.use('/api/movie', movie);
 app.use('/api/user', users);
+app.use('/api/images', images);
 
 app.listen(3100, () => console.log('Listening on port 3100....'));
 
