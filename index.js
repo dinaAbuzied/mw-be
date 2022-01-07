@@ -6,6 +6,7 @@ const languages = require('./routes/languages');
 const movie = require('./routes/movie');
 const users = require('./routes/users');
 const images = require('./routes/images');
+const movieList = require('./routes/movie-list');
 const cors = require('cors');
 const express = require('express');
 const app = express();
@@ -26,6 +27,7 @@ app.use('/api/languages', languages);
 app.use('/api/movie', movie);
 app.use('/api/user', users);
 app.use('/api/images', images);
+app.use('/api/movieList', movieList);
 
 app.listen(3100, () => console.log('Listening on port 3100....'));
 

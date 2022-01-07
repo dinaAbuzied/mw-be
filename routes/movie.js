@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth');
+const { MovieList } = require('../models/movie-list');
 const axios = require('axios');
 const { tmdbURL, tmdbKey } = require('../config');
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     if (!req.query.id) {
         return res.status(500).send({ code: 500, message: 'no movie id provided' });
     }
@@ -14,9 +16,17 @@ router.get('/', async (req, res) => {
             }
         }
     )
-        .then(function (response) {
+        .then(async function (response) {
             const { id, overview, release_date, poster_path, title, genres, runtime, production_countries, imdb_id } = response.data;
-            return res.send({ details: { id, overview, release_date, poster_path, title, genres, runtime, production_countries, imdb_id } });
+            let lists = [];
+            if (req.user) {
+                const list = await MovieList.findOne({ userID: req.user._id });
+                const movie = list.movies.find(m => {
+                    return m.tmdbID == req.query.id
+                });
+                if (movie) lists = movie.lists;
+            }
+            return res.send({ details: { id, overview, release_date, poster_path, title, genres, runtime, production_countries, imdb_id, lists } });
         })
         .catch(function (error) {
             res.status(500).send({ code: 500, message: error.message });

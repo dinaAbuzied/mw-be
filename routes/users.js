@@ -1,4 +1,5 @@
 const { registerValidation, loginValidation, userUpdateValidation, User } = require('../models/users');
+const { MovieList } = require('../models/movie-list');
 const { Profile } = require('../models/images');
 const { jwtKey } = require('../config');
 const auth = require('../middleware/auth');
@@ -18,12 +19,14 @@ router.post('/register', async (req, res) => {
     if (user) return res.status(400).send({ code: 400, message: 'Email already registered' });
 
     user = new User({ username, email, password });
+    const list = new MovieList({ userID: user._id });
 
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
 
     try {
         await user.save();
+        await list.save();
     }
     catch (ex) {
         return res.status(500).send({ code: 400, message: ex.message });
