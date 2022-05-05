@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth');
+const { MovieList } = require('../models/movie-list');
 const axios = require('axios');
 const { tmdbURL, tmdbKey } = require('../config');
 
@@ -27,11 +29,16 @@ router.get('/short', async (req, res) => {
         });
 })
 
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     let filters;
     if (req.query.filters) {
         filters = JSON.parse(req.query.filters);
         console.log(filters.language)
+    }
+    let userMovies = [];
+    if (req.user) {
+        const userList = await MovieList.findOne({ userID: req.user._id });
+        userMovies = userList.movies;
     }
     search(req.query.page, req.query.query)
         .then(function (response) {
@@ -39,7 +46,9 @@ router.get('/', async (req, res) => {
             return res.send({
                 results: results.map(movie => {
                     const { genre_ids, title, poster_path, release_date, id } = movie;
-                    return { genre_ids, title, poster_path, release_date, id, fav: false, later: false, wish: false, own: false }
+                    const usermovie = userMovies.find(m => m.tmdbID == id)
+                    const lists = usermovie ? usermovie.lists : [];
+                    return { genre_ids, title, poster_path, release_date, id, lists }
                 }),
                 total_results, total_pages, page
             });

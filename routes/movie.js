@@ -64,15 +64,20 @@ router.get('/credits', async (req, res) => {
         });
 })
 
-router.get('/now_playing', async (req, res) => {
-    getMovieList('now_playing', res);
+router.get('/now_playing', auth, async (req, res) => {
+    getMovieList('now_playing', req, res);
 })
 
-router.get('/upcoming', async (req, res) => {
-    getMovieList('upcoming', res);
+router.get('/upcoming', auth, async (req, res) => {
+    getMovieList('upcoming', req, res);
 })
 
-const getMovieList = (type, res) => {
+const getMovieList = async (type, req, res) => {
+    let userMovies = [];
+    if (req.user) {
+        const userList = await MovieList.findOne({ userID: req.user._id });
+        userMovies = userList.movies;
+    }
     axios.get(tmdbURL + 'movie/' + type,
         {
             params: {
@@ -84,7 +89,9 @@ const getMovieList = (type, res) => {
             return res.send({
                 results: response.data.results.slice(0, 10).map(movie => {
                     const { title, poster_path, id } = movie;
-                    return { title, poster_path, id }
+                    const usermovie = userMovies.find(m => m.tmdbID == id)
+                    const lists = usermovie ? usermovie.lists : [];
+                    return { title, poster_path, id, lists }
                 })
             });
         })
