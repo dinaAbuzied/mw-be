@@ -5,15 +5,32 @@ const { MovieList, Movie, movieValidation } = require('../models/movie-list');
 const axios = require('axios');
 const { tmdbURL, tmdbKey } = require('../config');
 
+router.get('/', auth, async (req, res) => {
+    const list = await MovieList.findOne({ 'userID': req.user._id });
+    if (!list) return res.status(400).send('Invalid List!');
+
+    const movies = [];
+    for (const m of list.movies) {
+        let movie = await Movie.findById(m.id);
+        const {poster_path, movieID, title, release_date, genres} = movie;
+        movies.push({lists: m.lists, poster_path, id: movieID, title, release_date, genres});
+      }
+    return res.send({ movies });
+})
+
 router.put('/:type', auth, async (req, res) => {
     const list = await MovieList.findOne({ 'userID': req.user._id });
     if (!list) return res.status(400).send('Invalid List!');
 
+    const movieIndex = list.movies.findIndex(movie => movie.tmdbID === req.body.movieID);
     const movieobj = list.movies.find(movie => movie.tmdbID === req.body.movieID);
     if (movieobj) {
         const index = movieobj.lists.indexOf(req.params.type);
         if (index >= 0) {
             movieobj.lists.splice(index, 1);
+            if(movieobj.lists.length == 0) {
+                list.movies.splice(movieIndex, 1);
+            }
         } else {
             movieobj.lists.push(req.params.type);
         }
