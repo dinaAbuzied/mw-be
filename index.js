@@ -30,7 +30,7 @@ app.use('/api/user', users);
 app.use('/api/images', images);
 app.use('/api/movieList', movieList);
 
-app.listen(3100, () => console.log('Listening on port 3100....'));
+app.listen(process.env.PORT || 3100, () => console.log('Listening on port 3100....'));
 
 // TODO: store url as env var
 mongoose.connect(config.mongoDb, { useNewUrlParser: true, useUnifiedTopology: true })
