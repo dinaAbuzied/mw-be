@@ -10,6 +10,7 @@ const movieList = require('./routes/movie-list');
 const cors = require('cors');
 const express = require('express');
 const app = express();
+const config = require('./config');
 
 // TODO: Configure on production
 app.use(cors({
@@ -32,5 +33,5 @@ app.use('/api/movieList', movieList);
 app.listen(3100, () => console.log('Listening on port 3100....'));
 
 // TODO: store url as env var
-mongoose.connect('mongodb://127.0.0.1:27017/mw', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(config.mongoDb, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('DB connected'));
