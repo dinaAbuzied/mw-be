@@ -7,6 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
   },
+  "engines": {
+    "node": "12.21.0"
+  },
   "author": "Dina Abuzied",
   "license": "ISC",
   "dependencies": {
